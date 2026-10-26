@@ -1,0 +1,14 @@
+.git
+**/*.gitignore
+**/*.md
+**/*.DS_Store
+**/*.pdf
+payhub/vendor
+payhub/node_modules
+payhub/.env.local
+payhub/.env.*.local
+payhub/var
+Makefile
+compose*.yml
+.env
+.vscode

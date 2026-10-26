@@ -1,0 +1,5 @@
+/guides
+*.pdf
+PLAN.md
+CLAUDE.md
+/.env
