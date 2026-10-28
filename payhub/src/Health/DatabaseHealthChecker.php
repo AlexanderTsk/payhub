@@ -6,14 +6,14 @@ namespace App\Health;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 final class DatabaseHealthChecker
 {
     private readonly Connection $connection;
-    private readonly Logger $logger;
+    private readonly LoggerInterface $logger;
 
-    public function __construct(Connection $connection, Logger $logger)
+    public function __construct(Connection $connection, LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->logger = $logger;
