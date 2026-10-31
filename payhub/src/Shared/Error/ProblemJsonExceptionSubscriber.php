@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Shared\Error;
 
 use App\Shared\RequestId\RequestIdStorage;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -15,6 +17,9 @@ final class ProblemJsonExceptionSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly RequestIdStorage $requestIdStorage,
+        #[Autowire('%kernel.debug%')]
+        private readonly bool $debug,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -33,15 +38,27 @@ final class ProblemJsonExceptionSubscriber implements EventSubscriberInterface
 
         $exception = $event->getThrowable();
         $statusCode = $this->getStatusCode($exception);
+
+        if ($statusCode >= 500) {
+            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+        } else {
+            $this->logger->warning($exception->getMessage(), ['exception' => $exception]);
+        }
+
         $headers = $exception instanceof HttpExceptionInterface ? $exception->getHeaders() : [];
+        $body = [
+            'request_id' => $this->requestIdStorage->get(),
+            'title' => JsonResponse::$statusTexts[$statusCode],
+            'status' => $statusCode,
+            'type' => 'about:blank',
+        ];
+        if ($this->debug) {
+            $body['detail'] = $exception->getMessage();
+        }
+
         $event->setResponse(
             new JsonResponse(
-                [
-                    'request_id' => $this->requestIdStorage->get(),
-                    'title' => JsonResponse::$statusTexts[$statusCode],
-                    'status' => $statusCode,
-                    'type' => 'about:blank',
-                ],
+                $body,
                 $statusCode,
                 array_merge(['Content-Type' => 'application/problem+json'], $headers)
             )
