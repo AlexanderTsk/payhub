@@ -1,0 +1,6 @@
+<?php
+
+declare(strict_types=1);
+// dev.encrypt.public on Sat, 31 Oct 2026 11:46:13 +0000
+
+return "\x1C\xE0\x93\x12wl0\x91L\xEA\x17\xCBGVwot\x9A\xB9\x04\x81\xCC\x862\xC9\x14~\x19\x89\xA5\xCB8";
